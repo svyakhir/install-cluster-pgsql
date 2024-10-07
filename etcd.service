@@ -8,8 +8,7 @@ Wants=network-online.target
 [Service]
 User=etcd
 Type=notify
-#WorkingDirectory=/var/lib/etcd/
-WorkingDirectory=/opt/etcd/
+WorkingDirectory=/var/lib/etcd/
 EnvironmentFile=-/etc/etcd/etcd.conf
 User=etcd
 # set GOMAXPROCS to number of processors
