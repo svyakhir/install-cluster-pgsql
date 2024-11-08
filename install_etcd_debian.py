@@ -2,21 +2,20 @@ import paramiko
 import time
 from config import *
 
-def connect_to_nodes(node): #  Подключение к ноде и установка etcd
+def connect_to_nodes(node, execute_function): #  Подключение к ноде
     try:
         key = paramiko.RSAKey.from_private_key_file(path_pkey)
         client = paramiko.client.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         client.connect(node, username=username, pkey=key)
         print(f"Connected to node {node}")
-        # Установка etcd на удаленной машине
-        install_etcd_debian(client)
+        execute_function(client) # Выполняемая функция
     except Exception as error:
         print(f"Error connecting to {node}: {error}")
     finally:
         client.close()
 
-def sftp_copy(node,local_path, remote_path):
+def sftp_copy(node,local_path, remote_path): #  копирование на ноды указанных в переменных файлов
     try:
         # Устанавливаем SSH-соединение
         key = paramiko.RSAKey.from_private_key_file(path_pkey)
@@ -32,7 +31,7 @@ def sftp_copy(node,local_path, remote_path):
     finally:
         sftp.close()
 
-def install_etcd_debian(client):
+def install_etcd_debian(client): #  Установка etcd на дебиан
     # Копирование конфигурационных файлов
     print(f"Copying etcd.service to {node}")
     sftp_copy(node, 'etcd.service', '/tmp/etcd.service')
@@ -53,11 +52,7 @@ def install_etcd_debian(client):
         'chmod -R 700 /var/lib/etcd',
         f'rm -rf /tmp/etcd-{ETCD_VER}-linux-amd64*',
         'cp /tmp/etcd.service /etc/systemd/system/etcd.service',
-        'cp /tmp/etcd.conf /etc/etcd/etcd.conf',
-        'systemctl daemon-reload',
-        'systemctl enable etcd',
-        'systemctl start etcd',
-        'systemctl status etcd'
+        'cp /tmp/etcd.conf /etc/etcd/etcd.conf'
     ]
     # Выполнение команд
     for command in commands:
@@ -65,6 +60,10 @@ def install_etcd_debian(client):
         execute_sudo_command(client, command)
         time.sleep(2)
 
+def start_etcd_debian(node):
+    commands = [
+
+    ]
 def execute_sudo_command(client, command):
     # Подключаемся к root сессии и выполняем команды по root
     stdin, stdout, stderr = client.exec_command(f"sudo {command}")
@@ -95,6 +94,7 @@ for node in nodes:
         print(f'ETCD_HEARTBEAT_INTERVAL="2000"', file=file)
         print(f'ETCD_INITIAL_ELECTION_TICK_ADVANCE="false"', file=file)
         print(f'ETCD_ENABLE_V2="true"', file=file)
-    print(f"Файл etcd.conf подготовлен для ноды {num}!")
-    connect_to_nodes(node)
+    print(f"Файл etcd.conf подготовлен для ноды {num}!\n")
+    connect_to_nodes(node, install_etcd_debian)
     num += 1
+
