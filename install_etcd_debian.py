@@ -60,10 +60,25 @@ def install_etcd_debian(client): #  Установка etcd на дебиан
         execute_sudo_command(client, command)
         time.sleep(2)
 
-def start_etcd_debian(node):
-    commands = [
+def systemctl_demon_reload(client):
+    print(f"Executing as sudo systemctl daemon-reload")
+    execute_sudo_command(client, 'systemctl daemon-reload')
+    time.sleep(2)
 
+def systemctl_start_etcd(client): # Запуск служб etcd
+    commands = ['systemctl enable etcd',
+                'systemctl start etcd',
+                'systemctl status etcd | awk "/ etcd.service|Loaded:|Active:/"'
     ]
+    for command in commands:
+        print(f"Executing as sudo {command}")
+        execute_sudo_command(client, command)
+        time.sleep(3)
+
+def check_leader(client):
+    print(f"Executing as sudo etcdctl endpoint status --cluster -w table")
+    execute_sudo_command(client, 'etcdctl endpoint status --cluster -w table')
+    time.sleep(2)
 def execute_sudo_command(client, command):
     # Подключаемся к root сессии и выполняем команды по root
     stdin, stdout, stderr = client.exec_command(f"sudo {command}")
@@ -98,3 +113,11 @@ for node in nodes:
     connect_to_nodes(node, install_etcd_debian)
     num += 1
 
+for node in nodes:
+    connect_to_nodes(node, systemctl_demon_reload)
+
+for node in nodes:
+    connect_to_nodes(node, systemctl_start_etcd)
+
+for node in nodes:
+    connect_to_nodes(node, check_leader)
