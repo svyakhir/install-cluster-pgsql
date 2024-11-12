@@ -15,6 +15,20 @@ def connect_to_nodes(node, execute_function): #  Подключение к но�
     finally:
         client.close()
 
+def execute_sudo_command(client, command):
+    # Подключаемся к root сессии и выполняем команды по root
+    stdin, stdout, stderr = client.exec_command(f"sudo {command}")
+    # stdin.write(f'{password}\n') #  Используем если в /etc/sudoers не отключена проверка пароля
+    # stdin.flush() #  Используем если в /etc/sudoers не отключена проверка пароля
+
+    # Вывод результата выполнения команд
+    output = stdout.read().decode()
+    error = stderr.read().decode()
+    if output:
+        print(f"OUTPUT: {output}")
+    if error:
+        print(f"ERROR: {error}")
+
 def sftp_copy(node,local_path, remote_path): #  копирование на ноды указанных в переменных файлов
     try:
         # Устанавливаем SSH-соединение
@@ -79,19 +93,7 @@ def check_leader(client):
     print(f"Executing as sudo etcdctl endpoint status --cluster -w table")
     execute_sudo_command(client, 'etcdctl endpoint status --cluster -w table')
     time.sleep(2)
-def execute_sudo_command(client, command):
-    # Подключаемся к root сессии и выполняем команды по root
-    stdin, stdout, stderr = client.exec_command(f"sudo {command}")
-    # stdin.write(f'{password}\n') #  Используем если в /etc/sudoers не отключена проверка пароля
-    # stdin.flush() #  Используем если в /etc/sudoers не отключена проверка пароля
 
-    # Вывод результата выполнения команд
-    output = stdout.read().decode()
-    error = stderr.read().decode()
-    if output:
-        print(f"OUTPUT: {output}")
-    if error:
-        print(f"ERROR: {error}")
 
 num = 1
 for node in nodes:
