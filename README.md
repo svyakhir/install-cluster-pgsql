@@ -27,3 +27,4 @@ password = "password"
 path_pkey = "D:/home/username"  # Путь до приватного ключа
 ```
 2. Для установки etcd - запустить install_etcd_debian.py
+3. Для установки Postgresql 13 - запустить install_postgresql.py
