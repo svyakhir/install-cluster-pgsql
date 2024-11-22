@@ -12,7 +12,7 @@
 #Версия ETCD  
 ETCD_VER='v3.5.15'
 
-#Список нод на которые подключаемся  
+#Список нод на которые подключаемся. Используем только ip адреса  
 nodes = [
     '192.168.0.1',
     '192.168.0.2',
@@ -25,6 +25,10 @@ password = "password"
 
 #Параметры для подключения по ssh с ключом  
 path_pkey = "D:/home/username"  # Путь до приватного ключа
+
+# Параметры Patroni
+patroni_password = "password"
 ```
 2. Для установки etcd - запустить install_etcd_debian.py
 3. Для установки Postgresql 13 - запустить install_postgresql.py
+4. Для установки Patroni - запустить install_patroni.py
