@@ -132,7 +132,7 @@ if check_ssh_connect(hosts):
             print(
                 f"\033[43m{host} ETCD is already installed. Necessary to check that the existing installation is correctly!\033[0m")
         else:
-            print(f"\n{host} ETCD is not installed\nInstalling ETCD to host {host}")
+            print(f"\n\033[44m{host} ETCD is not installed\nInstalling ETCD to host {host}\033[0m")
             with open("etcd.conf", "w") as file:  # Создает файл конфигурации etcd
                 print(f'ETCD_NAME="etcd{num}"', file=file)
                 print(f'ETCD_LISTEN_CLIENT_URLS="http://0.0.0.0:2379"', file=file)
@@ -149,7 +149,7 @@ if check_ssh_connect(hosts):
                 print(f'ETCD_HEARTBEAT_INTERVAL="2000"', file=file)
                 print(f'ETCD_INITIAL_ELECTION_TICK_ADVANCE="false"', file=file)
                 print(f'ETCD_ENABLE_V2="true"', file=file)
-            print(f"Файл etcd.conf подготовлен для ноды {num}!\n")
+            print(f"\033[44mФайл etcd.conf подготовлен для ноды {num}!\n\033[0m")
             install_etcd_debian(connect)
         connect.close()
         num += 1
@@ -157,19 +157,19 @@ else:
     print("\033[41mOne or more connections failed. Exiting.\033[0m")
 
 for host in hosts:  # Перезагрузка демона
-    print(f"\033[42mExecuting systemctl daemon-reload to host {host}\033[0m")
+    print(f"\033[44mExecuting systemctl daemon-reload to host {host}\033[0m")
     connect = connect_to_hosts(host)
     systemctl_demon_reload(connect)
     connect.close()
 
 for host in hosts:  # Запуск ETCD
-    print(f"\033[42mExecuting systemctl start etcd to host {host}\033[0m")
+    print(f"\033[44mExecuting systemctl start etcd to host {host}\033[0m")
     connect = connect_to_hosts(host)
     systemctl_start_etcd(connect)
     connect.close()
 
 for host in hosts:  # Проверка лидера ETCD
-    print(f"\033[42mExecuting check_leader to host {host}\033[0m")
+    print(f"\033[44mExecuting check_leader to host {host}\033[0m")
     connect = connect_to_hosts(host)
     check_leader(connect)
     connect.close()
