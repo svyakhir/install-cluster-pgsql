@@ -77,7 +77,7 @@ if check_ssh_connect(hosts):
         if check_postgresql:
             print(f"\033[43m{host} Postgresql is already installed. Necessary to check that the existing installation is correctly!\033[0m")
         else:
-            print(f"\n{host} Postgresql is not installed\nInstalling Postgresql 13 to host {host}")
+            print(f"\n\033[44m{host} Postgresql is not installed\033[0m\n\033[44mInstalling Postgresql 13 to host {host}\033[0m")
             install_postgresql_debian(connect)
         connect.close()
     print(f"\n\033[42mPostgresql has been successfully installed on all hosts {hosts}\033[0m")
