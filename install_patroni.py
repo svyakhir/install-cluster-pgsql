@@ -75,7 +75,7 @@ def get_hostname(function_connect): #  Получить имя хоста, ис�
     return output
 
 def install_patroni_debian(function_connect):
-    print(f"Copying etcd.conf to {host}")
+    print(f"Copying /etc/patroni/config.yml to {host}")
     sftp_copy(host, 'config.yml', '/tmp/config.yml')
 
     commands = [
@@ -125,7 +125,7 @@ if check_ssh_connect(hosts):
             modified_host = ".".join(host.split(".")[:3]) + ".0"
             print(f"\033[44mPatroni is not installed to host {host}\033[0m\n\033[44mInstalling Patroni to host {host}\033[0m")
             with open("config.yml", "w") as file:
-                print(f"scope: 13-pgsql5", file=file)
+                print(f"scope: 13-pgsql", file=file)
                 print(f"name: {hostname}", file=file)
                 print(f"log:", file=file)
                 print(f"  level: INFO", file=file)
@@ -243,7 +243,7 @@ if check_ssh_connect(hosts):
             install_patroni_debian(connect)
         connect.close()
 
-for host in hosts:  # Перезагрузка демона
+for host in hosts:  # Перечитать конфигурацию systemd
     print(f"\033[44mExecuting systemctl daemon-reload to host {host}\033[0m")
     connect = connect_to_hosts(host)
     systemctl_demon_reload(connect)
