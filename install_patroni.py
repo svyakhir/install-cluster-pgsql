@@ -69,7 +69,7 @@ def check_patroni_installed(function_connect):
         return True
     return False
 
-def get_hostname(function_connect):
+def get_hostname(function_connect): #  Получить имя хоста, используется в конфиге патрони
     stdin, stdout, stdoerr = function_connect.exec_command(f"hostname")
     output = stdout.read().decode()
     return output
