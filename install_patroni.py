@@ -83,15 +83,36 @@ def install_patroni_debian(function_connect):
         f"apt upgrade -y",
         f"apt install -y patroni",
         f"mkdir -p /etc/patroni",
+        f"mv /tmp/config.yml /etc/patroni/config.yml",
         f"chown -R postgres:postgres /etc/patroni",
-        f"rm -rf /var/lib/postgresql/13/main/*"
-        f"cp -ar /tmp/config.yml /etc/patroni/config.yml"
+        f"chmod -R 700 /etc/patroni",
+        f"rm -rf /var/lib/postgresql/13/main/",
+        f"ls -laht /var/lib/postgresql/13/main/"
     ]
 
     for command in commands:
         print(f"Executing as sudo {command}")
         execute_sudo_command(function_connect, command)
         time.sleep(2)
+
+def systemctl_demon_reload(function_connect):
+    print(f"Executing as sudo systemctl daemon-reload")
+    execute_sudo_command(function_connect, 'systemctl daemon-reload')
+    time.sleep(2)
+
+def systemctl_start_patroni(function_connect):  # Запуск служб etcd
+    commands = ['systemctl enable patroni --now',
+                'systemctl status patroni | awk "/ etcd.service|Loaded:|Active:/"'
+                ]
+    for command in commands:
+        print(f"Executing as sudo {command}")
+        execute_sudo_command(function_connect, command)
+        time.sleep(3)
+
+def check_leader_patroni(function_connect):
+    print(f"Executing as sudo patronictl -c /etc/patroni/config.yml list")
+    execute_sudo_command(function_connect, 'patronictl -c /etc/patroni/config.yml list')
+    time.sleep(2)
 
 if check_ssh_connect(hosts):
     print()
@@ -102,10 +123,10 @@ if check_ssh_connect(hosts):
             print(f"\033[43mPatroni is already installed to host {host}. Necessary to check that the existing installation is correctly!\033[0m")
         else:
             hostname = get_hostname(connect)
-            modified_host = ".".join(host.split(".")[:2]) + ".0.0"
+            modified_host = ".".join(host.split(".")[:3]) + ".0"
             print(f"\033[44mPatroni is not installed to host {host}\033[0m\n\033[44mInstalling Patroni to host {host}\033[0m")
             with open("config.yml", "w") as file:
-                print(f"scope: 13-pgsql", file=file)
+                print(f"scope: 13-pgsql5", file=file)
                 print(f"name: {hostname}", file=file)
                 print(f"log:", file=file)
                 print(f"  level: INFO", file=file)
@@ -222,3 +243,21 @@ if check_ssh_connect(hosts):
             print(f"Файл config.yml подготовлен для ноды {host}!\n")
             install_patroni_debian(connect)
         connect.close()
+
+for host in hosts:  # Перезагрузка демона
+    print(f"\033[44mExecuting systemctl daemon-reload to host {host}\033[0m")
+    connect = connect_to_hosts(host)
+    systemctl_demon_reload(connect)
+    connect.close()
+
+for host in hosts:  # Запуск ETCD
+    print(f"\033[44mExecuting systemctl start patroni to host {host}\033[0m")
+    connect = connect_to_hosts(host)
+    systemctl_start_patroni(connect)
+    connect.close()
+
+for host in hosts:  # Проверка лидера ETCD
+    print(f"\033[44mExecuting check_leader_patroni to host {host}\033[0m")
+    connect = connect_to_hosts(host)
+    check_leader_patroni(connect)
+    connect.close()
