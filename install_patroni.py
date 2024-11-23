@@ -86,8 +86,7 @@ def install_patroni_debian(function_connect):
         f"mv /tmp/config.yml /etc/patroni/config.yml",
         f"chown -R postgres:postgres /etc/patroni",
         f"chmod -R 700 /etc/patroni",
-        f"rm -rf /var/lib/postgresql/13/main/",
-        f"ls -laht /var/lib/postgresql/13/main/"
+        f"rm -rf /var/lib/postgresql/13/main/"
     ]
 
     for command in commands:
