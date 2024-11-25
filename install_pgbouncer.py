@@ -80,7 +80,7 @@ def install_pgbouncer_debian(function_connect):
         f'cp -a /etc/pgbouncer/pgbouncer.ini /etc/pgbouncer/pgbouncer.ini.orig',
         f'chmod 755 /var/log/postgresql',
         f'cp /tmp/pgbouncer.ini /etc/pgbouncer/pgbouncer.ini',
-        f'echo \'"postgres" "{patroni_password}"\' | sudo tee -a /etc/pgbouncer/userlist.txt'
+        f'echo \'"{dbuser}" "{dbpassword}"\' | sudo tee -a /etc/pgbouncer/userlist.txt'
     ]
 
     for command in commands:
@@ -98,11 +98,6 @@ def systemctl_start_pgbouncer(function_connect):
         execute_sudo_command(function_connect, command)
         time.sleep(3)
 
-def check_pgbouncer(function_connect):
-    stdin, stdout, stderr = function_connect.exec_command('Executing psql -h {host} -p 5432 -U {dbuser} -d {dbname} -c "SHOW POOLS;"')
-    output = stdout.read().decode()
-    return output
-
 if check_ssh_connect(hosts):
     print()
     for host in hosts:
@@ -111,11 +106,11 @@ if check_ssh_connect(hosts):
             print(f"\033[43mPgbouncer is already installed to host {host}. Necessary to check that the existing installation is correctly!\033[0m")
         else:
             print(f"\033[44mPgbouncer is not installed to host {host}\033[0m\n\033[44mInstalling Pgbouncer to host {host}\033[0m")
-            with open("pgbouncer.ini", "w") as file:
+            with open("pgbouncer.ini", "w", encoding="utf-8") as file:
                 print(f'[databases]', file=file)
-                print(f'# Подключения к базе данных', file=file)
-                print(f'name_local = host=127.0.0.1 port=5432 dbname={dbname} auth_user={dbuser}', file=file)
-                print(f'name = {host} port=5432 dbname={dbname} auth_user={dbuser}', file=file)
+                print(f'# Подключения к базе данных. Определяет какие БД доступны через PgBouncer', file=file)
+                print(f'{dbname} = host={host} port=5432 dbname={dbname} auth_user={dbuser}', file=file)
+                print(f'* = host=127.0.0.1 port=5432', file=file)
                 print(f'\n[pgbouncer]', file=file)
                 print(f'# Пользователь для управления PgBouncer', file=file)
                 print(f'admin_users = {pgbouncer_user}', file=file)
@@ -161,8 +156,6 @@ for host in hosts: #  Запустиь Pgbouncer
     systemctl_start_pgbouncer(connect)
     connect.close()
 
+print(f"\033[42mFor check PgBouncer execute:\033[0m")
 for host in hosts:
-    print(f'Executing psql -h {host} -p 5432 -U {dbuser} -d {dbname} -c "SHOW POOLS;"')
-    connect = connect_to_hosts(host)
-    check_pgbouncer(connect)
-    connect.close()
+    print(f"psql -h {host} -p 6432 -U {dbuser} -d {dbname}")
