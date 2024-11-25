@@ -1,3 +1,10 @@
+Создает кластер Postgres из трех нод.  
+БД и пользователь БД по умолчанию postgres. Пароль указывается в config.py  
+
+На каждую ноду устанавливается ETCD, Postgresql, Patroni, PgBouncer, HAproxy, KeepAlive
+
+Протестировано на Debian 11
+
 ### Подготовка хостов ###  
 1. Выполнить apt update -y && apt upgrade -y
 2. Установить *openssh-server*  
@@ -7,7 +14,7 @@
 6. На хостах не должен быть установлен Postgresql
 
 ### Установка ###
-1. Создать файл config.py. В нем указать информацию для подключения к нодам  
+0. Создать файл config.py. В нем указать информацию для подключения к нодам  
 ```
 #Версия ETCD  
 ETCD_VER='v3.5.15'
@@ -28,7 +35,27 @@ path_pkey = "D:/home/username"  # Путь до приватного ключа
 
 # Параметры Patroni
 patroni_password = "password"
+
+# Параметры БД. Предварительно создаем их в БД руками.
+# 
+dbname = "dbname"
+dbuser = "dbuser"
+dbpassword = "dbpassword"
+
+# Параметры PgBouncer
+pgbouncer_user = "admin" # Пользователь для управления PgBouncer
 ```
-2. Для установки etcd - запустить install_etcd_debian.py
-3. Для установки Postgresql 13 - запустить install_postgresql.py
-4. Для установки Patroni - запустить install_patroni.py
+1. Для установки etcd - запустить install_etcd_debian.py
+2. Для установки Postgresql 13 - запустить install_postgresql.py
+3. Для установки Patroni - запустить install_patroni.py  
+  Если планируется использовать БД и пользователся не postgres,тогда создаем:  
+  `CREATE ROLE dbuser LOGIN SUPERUSER PASSWORD 'dbpassword';`  
+  `CREATE DATABASE dbname WITH OWNER dbuser;`  
+  И в PgBouncer используем эти параметры.  
+  Если БД и пользователь не создавались, используем postgres. Как п умолчанию. Пароль используем как в patroni
+4. Для устаовки PgBouncer - запусить install_pgbouncer.  
+  После установки PgBouncer нужно выставить необходимые значения: 
+    - размер пула соединений
+    - максимальное количество подключений к PgBouncer
+
+    и выполнить перезагрузку сервиса `systemctl restart pgbouncer`
