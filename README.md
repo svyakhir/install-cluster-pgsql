@@ -44,6 +44,10 @@ dbpassword = "dbpassword"
 
 # Параметры PgBouncer
 pgbouncer_user = "admin" # Пользователь для управления PgBouncer
+
+# Доступ до веб интерфейса HAproxy
+haproxyuser = "vyakhir"
+haproxypassword = "vyakhir"
 ```
 1. Для установки etcd - запустить install_etcd_debian.py
 2. Для установки Postgresql 13 - запустить install_postgresql.py
@@ -53,9 +57,10 @@ pgbouncer_user = "admin" # Пользователь для управления 
   `CREATE DATABASE dbname WITH OWNER dbuser;`  
   И в PgBouncer используем эти параметры.  
   Если БД и пользователь не создавались, используем postgres. Как п умолчанию. Пароль используем как в patroni
-4. Для устаовки PgBouncer - запусить install_pgbouncer.  
+4. Для установки PgBouncer - запусить install_pgbouncer.py.  
   После установки PgBouncer нужно выставить необходимые значения: 
     - размер пула соединений
     - максимальное количество подключений к PgBouncer
 
     и выполнить перезагрузку сервиса `systemctl restart pgbouncer`
+5. Для установки HAproxy - запустить install_haproxy.py
