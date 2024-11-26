@@ -138,3 +138,7 @@ for host in hosts: #  Запустиь Pgbouncer
     connect = connect_to_hosts(host)
     systemctl_restart_haproxy(connect)
     connect.close()
+
+print(f"\033[42mFor check HAproxy execute:\033[0m")
+for host in hosts:
+    print(f"psql -h {host} -p 5000 -U {dbuser} -d {dbname}")
