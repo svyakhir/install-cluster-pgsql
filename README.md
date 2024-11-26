@@ -34,10 +34,9 @@ password = "password"
 path_pkey = "D:/home/username"  # Путь до приватного ключа
 
 # Параметры Patroni
-patroni_password = "password"
+patroni_password = "password" # Используется при подключении к БД развернутьой с помощью Патрони. Пользователь postgres
 
-# Параметры БД. Предварительно создаем их в БД руками.
-# 
+# Параметры БД. Предварительно создаем их в БД руками. 
 dbname = "dbname"
 dbuser = "dbuser"
 dbpassword = "dbpassword"
@@ -48,6 +47,10 @@ pgbouncer_user = "admin" # Пользователь для управления 
 # Доступ до веб интерфейса HAproxy
 haproxyuser = "vyakhir"
 haproxypassword = "vyakhir"
+
+# Виртуальный IP адрес для Keepalived
+virt_ip = '192.168.0.200' #  Должен быть в той же подсети и что и основные сервера
+net_interface = 'ens33' #  Интерфейс сети к которой прикручиваем виртуальную сеть
 ```
 1. Для установки etcd - запустить install_etcd_debian.py
 2. Для установки Postgresql 13 - запустить install_postgresql.py
@@ -64,3 +67,4 @@ haproxypassword = "vyakhir"
 
     и выполнить перезагрузку сервиса `systemctl restart pgbouncer`
 5. Для установки HAproxy - запустить install_haproxy.py
+6. Для установки Keepalive - запустить install_keepalived.py
