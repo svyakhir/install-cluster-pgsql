@@ -77,7 +77,7 @@ def install_haproxy_debian(function_connect):
         f'apt update -y',
         f'apt install haproxy -y',
         f'cp -a /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.orig',
-        f'cp /tmp/haproxy.cfg /etc/haproxy/haproxy.cfg',
+        f'mv /tmp/haproxy.cfg /etc/haproxy/haproxy.cfg',
         f'haproxy -f /etc/haproxy/haproxy.cfg -c'
     ]
 

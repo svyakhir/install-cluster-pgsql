@@ -79,7 +79,7 @@ def install_pgbouncer_debian(function_connect):
         f'systemctl stop pgbouncer',
         f'cp -a /etc/pgbouncer/pgbouncer.ini /etc/pgbouncer/pgbouncer.ini.orig',
         f'chmod 755 /var/log/postgresql',
-        f'cp /tmp/pgbouncer.ini /etc/pgbouncer/pgbouncer.ini',
+        f'mv /tmp/pgbouncer.ini /etc/pgbouncer/pgbouncer.ini',
         f'echo \'"{dbuser}" "{dbpassword}"\' | sudo tee -a /etc/pgbouncer/userlist.txt'
     ]
 
