@@ -3,7 +3,7 @@
 
 На каждую ноду устанавливается ETCD, Postgresql, Patroni, PgBouncer, HAproxy, KeepAlive
 
-Протестировано на Debian 11
+Протестировано на Debian 11. На Debian 12 не стартовал патрони в apt идет Postgres 15
 
 ### Подготовка хостов ###  
 1. Выполнить apt update -y && apt upgrade -y
